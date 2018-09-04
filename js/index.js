@@ -97,7 +97,7 @@ function listRender() {
         target = 'finished';
     }
 
-    if(state[target].length==0) {
+    if(state[target].length === 0) {
         const html = 
         `
             <tr>
@@ -141,7 +141,7 @@ function tabActiveToggle() {
 function greetUser() {
     const hour = new Date().getHours();
     let time;
-    
+
     if(hour >= 21) {
         time = 'Night';
     }
