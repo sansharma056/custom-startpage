@@ -1,5 +1,5 @@
-const formBtn = document.querySelector('.button--search');
-const formTxt = document.querySelector('.button--text');
+const searchBtn = document.querySelector('.button--search');
+const searchInput = document.querySelector('.button--text');
 const greeting = document.querySelector('.greeting');
 
 const listBody = document.querySelectorAll('.list__body');
@@ -36,12 +36,14 @@ window.addEventListener('load', ()=> {
     listRender();
 });
 
-formBtn.addEventListener('click', (e)=> {
-    e.preventDefault();
-    const q = formTxt.value;
-    if(q) {
-        window.location.href = `https://www.google.com/search?q=${q}`;
+searchInput.addEventListener('keypress', (e) => {
+    if(e.keyCode === 13) {
+        searchClick(e);
     }
+});
+
+searchBtn.addEventListener('click', (e) => {
+    searchClick(e);
 });
 
 tabs.addEventListener('click', (e) => {
@@ -65,8 +67,33 @@ tabs.addEventListener('click', (e) => {
     listRender();
 });
 
+listInput.addEventListener('keydown', (e) => {
+    if(e.keyCode === 13) {
+        listClick(e);
+    }
+
+});
 
 listBtn.addEventListener('click', (e) => {
+    listClick(e);
+});
+
+listBody.forEach( e => {
+    e.addEventListener('click', (e) => {
+        itemTransfer(e);
+    });
+}); 
+
+function searchClick(e) {
+    e.preventDefault();
+    const q = searchInput.value;
+    if(q) {
+        window.open(`https://www.google.com/search?q=${q}`);
+        searchInput.value = '';
+    }
+}
+
+function listClick(e) {
     e.preventDefault();
 
     const item = document.querySelector('.list__input').value;
@@ -77,13 +104,7 @@ listBtn.addEventListener('click', (e) => {
         listRender();
         listInput.value = '';
     }
-});
-
-listBody.forEach( e => {
-    e.addEventListener('click', (e) => {
-        itemTransfer(e);
-    });
-}); 
+}
 
 function listRender() {
     listReset();
