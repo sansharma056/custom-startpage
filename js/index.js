@@ -15,7 +15,7 @@ const tabCont2 = document.querySelector('.tabs__content--2');
 let state = {
     activeTab: 1,
     pending: [],
-    finished: []
+    finished: []    
 };
 
 window.addEventListener('load', ()=> {
@@ -71,18 +71,70 @@ listInput.addEventListener('keydown', (e) => {
     if(e.keyCode === 13) {
         listClick(e);
     }
-
 });
+
+listBody.forEach( e => {
+    let source, destination;
+
+    e.addEventListener('click', (e) => {
+        window.e = e;
+        if(e.target.nodeName!='TD') {
+            let el = e.target.closest("span");
+            switch(el.id) {
+                case 'delete':  itemTransfer(e);
+                                break;
+                case 'edit':    itemEdit(e);
+                                break;
+                case 'check':   itemCheck(e);
+                                break;
+                }
+        }
+    });
+
+    e.addEventListener('dragstart', (e) => {
+        if(e.target.classList[0] === 'list__item') {
+            source = e.target;
+            e.dataTransfer.setData('text/plain', null);
+            e.dataTransfer.effectAllowed = 'move';
+        }        
+    });
+
+    e.addEventListener('keypress', (e) => {
+        if(e.keyCode === 13) {
+            document.querySelector('#check').click();
+        }
+    });
+  
+    e.addEventListener('dragenter', (e) => {
+        if(e.target.nodeName === 'TD') {
+            destination = e.target.parentNode;
+        }
+         if(destination!='undefined' && destination.classList[0] === 'list__item') {       
+            if(isBefore(source, destination)) {
+                source.parentNode.insertBefore(source, destination);
+            } else {
+                source.parentNode.insertBefore(source, destination.nextSibling);
+            }
+            listUpdate();
+            stateUpdate();
+        }            
+    });
+
+   function isBefore(a,b) {
+        if(a.parentNode == b.parentNode) {
+            for(let cur=a; cur; cur=cur.previousSibling) {
+                if(cur === b) {
+                    return true;
+                }
+            }   
+        }
+        return false;
+    }
+}); 
 
 listBtn.addEventListener('click', (e) => {
     listClick(e);
 });
-
-listBody.forEach( e => {
-    e.addEventListener('click', (e) => {
-        itemTransfer(e);
-    });
-}); 
 
 function searchClick(e) {
     e.preventDefault();
@@ -104,6 +156,20 @@ function listClick(e) {
         listRender();
         listInput.value = '';
     }
+}
+
+function listUpdate() {
+    const listItems = document.querySelectorAll('.list__item');
+    listItems.forEach( (e,i) => {
+        if(state.activeTab == 1) {
+            state.pending[i] = e.children[0].innerText;
+            e.dataset.id = i;
+        } else {
+            state.finished[i] = e.children[0].innerText;
+            e.dataset.id = i;
+        }
+    });
+
 }
 
 function listRender() {
@@ -131,10 +197,13 @@ function listRender() {
     state[target].forEach( (item, i) => {
         const html = 
         `
-            <tr class="list__item" data-id="${i}" data-target="${target}">
-                <td>${item}</td>
+            <tr class="list__item" draggable="true" data-id="${i}" data-status="${target}">
                 <td>
-                    <input class="checkbox" type="checkbox">
+                    ${item}
+                </td>
+                <td>
+                    <span id="delete" class="icon"><i class="fas fa-trash-alt"></i></span>
+                    <span id="edit" class="icon"><i class="fas fa-edit"></i></span>
                 </td>
             </tr>
         `;
@@ -192,10 +261,9 @@ function stateRestore() {
 }
 
 function itemTransfer(e) {
-    if(e.target.classList.contains('checkbox')){
-        const id = e.target.parentNode.parentNode;
+    const id = e.target.closest("tr");
 
-        if(id.dataset.target === 'pending') {
+        if(id.dataset.status === 'pending') {
             state.finished.push(state.pending[id.dataset.id]);
             state.pending.splice(id.dataset.id, 1);
         }
@@ -205,5 +273,37 @@ function itemTransfer(e) {
         
         stateUpdate();
         listRender();
+}
+
+function itemEdit(e) {
+    const item = e.target.closest('tr').children[0];
+    const icon = e.target.closest('span');
+
+    item.contentEditable = true;
+    item.style.cursor = 'text';
+    item.focus();
+    
+    icon.id = 'check';
+    icon.innerText = '';
+    icon.innerHTML = '<i class="fas fa-check-circle"></i>';
+}
+function itemCheck(e) {
+    e.preventDefault();
+    const item = e.target.closest('tr').children[0];
+    const icon = e.target.closest('span');
+
+    item.contentEditable = false;
+    item.style.cursor = '';
+
+    if(state.activeTab === 1) {
+        state.pending[item.parentNode.dataset.id] = item.innerText;
+    } else {
+        state.finished[item.parentNode.dataset.id], item.innerText;
     }
+
+    stateUpdate();
+
+    icon.id = 'edit';
+    icon.innerText = '';
+    icon.innerHTML = '<i class="fas fa-edit"></i>';    
 }

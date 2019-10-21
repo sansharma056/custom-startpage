@@ -5,6 +5,13 @@
 .tabs__content--1, .tabs__content--2 {
   display: none; }
 
+[draggable] {
+  cursor: move;
+}
+.list__item .icon {
+  cursor: pointer;
+}
+
 @keyframes spinAround {
   from {
     transform: rotate(0deg); }

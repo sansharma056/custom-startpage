@@ -1,7 +1,7 @@
 {
   "name": "startpage",
   "version": "1.0.0",
-  "description": "",
+  "description": "A custom startpage I made as a fun little project.",
   "main": "index.js",
   "scripts": {
     "css-build": "node-sass --omit-source-map-url sass/mystyles.scss css/mystyles.css",
@@ -14,5 +14,13 @@
   "devDependencies": {
     "bulma": "^0.7.1",
     "node-sass": "^4.9.3"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sansharma056/custom-startpage.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sansharma056/custom-startpage/issues"
+  },
+  "homepage": "https://github.com/sansharma056/custom-startpage#readme"
 }
